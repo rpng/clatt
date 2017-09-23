@@ -88,7 +88,7 @@ n_init_steps = 0;
 
 %% allocate memory for saving estimation results %%
 
-% % naive UIS: "naive" unscented incremental smoothing
+% % naive UIS: naive unscented incremental smoothing
 % % robot
 xRest_isam2 = zeros(3,nR,nSteps,nRuns); %estimated traj
 xRerr_isam2 = zeros(3,nR,nSteps,nRuns); %all err state
