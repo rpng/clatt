@@ -5,8 +5,6 @@ function [x, xlin, Rp,bp,qp] = uis(x,xlin, Plin, xprior,Pprior, Rp,bp,qp, curr_s
 global gRB
 J = [0 -1; 1 0];
 
-% which_LinPt_x_xlin = 0; %use x or xlin as linearization point
-
 % during batch update: do unscented transform or not?
 % it should be NOT, since 1) it is expensive to recover covariance 2) batch MAP is consistent (relinearize anyway)
 noUT = 1;
@@ -217,6 +215,7 @@ if mod(curr_step,nrelin) && curr_step>2 %incremental QR update
     
     % % *linearization points, xlin* updated by deltax to be the new estimate
     x = xlin + delta_x;
+    
     
 else %%%batch every *nrelin* steps (including first step)%%%
     

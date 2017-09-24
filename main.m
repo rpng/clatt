@@ -89,13 +89,11 @@ n_init_steps = 0;
 %% allocate memory for saving estimation results %%
 
 % % naive UIS: naive unscented incremental smoothing
-% % robot
 xRest_isam2 = zeros(3,nR,nSteps,nRuns); %estimated traj
 xRerr_isam2 = zeros(3,nR,nSteps,nRuns); %all err state
 Prr_isam2 = zeros(3,nR,nSteps,nRuns); %actually diag of Prr
 rmsRp_isam2 =  zeros(nR,nSteps,nRuns); %rms of robot position
 rmsRth_isam2 = zeros(nR,nSteps,nRuns); %rms of robot orientation
-% % target
 xTest_isam2 = zeros(dim_target,nT,nSteps,nRuns); %estimated target trajectory
 xTerr_isam2 = zeros(dim_target,nT,nSteps,nRuns); %all target error state
 PTT_isam2 = zeros(dim_target,dim_target,nT,nSteps,nRuns);
@@ -103,13 +101,11 @@ rmsT_isam2 =  zeros(nT,nSteps,nRuns); %rms of target position
 rmsTv_isam2 = zeros(nT,nSteps,nRuns); %rms of target velocity
 
 % % UIS: unscented incremental smoothing
-% % robot
 xRest_isam3 = zeros(3,nR,nSteps,nRuns); %estimated traj
 xRerr_isam3 = zeros(3,nR,nSteps,nRuns); %all err state
 Prr_isam3 = zeros(3,nR,nSteps,nRuns); %actually diag of Prr
 rmsRp_isam3 =  zeros(nR,nSteps,nRuns); %rms of robot position
 rmsRth_isam3 = zeros(nR,nSteps,nRuns); %rms of robot orientation
-% % target
 xTest_isam3 = zeros(dim_target,nT,nSteps,nRuns); %estimated target trajectory
 xTerr_isam3 = zeros(dim_target,nT,nSteps,nRuns); %all target error state
 PTT_isam3 = zeros(dim_target,dim_target,nT,nSteps,nRuns);
@@ -117,13 +113,11 @@ rmsT_isam3 =  zeros(nT,nSteps,nRuns); %rms of target position
 rmsTv_isam3 = zeros(nT,nSteps,nRuns); %rms of target velocity
 
 % % batch-MAP
-% % robot
 xRest_bmap = zeros(3,nR,nSteps,nRuns); %estimated traj
 xRerr_bmap = zeros(3,nR,nSteps,nRuns); %all err state
 Prr_bmap = zeros(3,nR,nSteps,nRuns); %actually diag of Prr
 rmsRp_bmap =  zeros(nR,nSteps,nRuns); %rms of robot position
 rmsRth_bmap = zeros(nR,nSteps,nRuns); %rms of robot orientation
-% % target
 xTest_bmap = zeros(dim_target,nT,nRuns);
 xTerr_bmap = zeros(dim_target,nT,nRuns);
 PTT_bmap = zeros(dim_target,nT,nRuns);
@@ -266,7 +260,7 @@ for kk = 1:nRuns
         end
         
         DO_EXACT_COV_REC = 0; %exact or approximate covariance recovery
-        % *exact* recovering covariance used in unscented transformation -- this is expensive!
+        % *exact* recovering covariance used in unscented transformation, though this is expensive!
         if k+1>2 && DO_EXACT_COV_REC
             Pe_isam2 = (Rp_isam2\eye(size(Rp_isam2)))*(Rp_isam2'\eye(size(Rp_isam2))); %info matrix for the states without first robots' poses which are assumed to be known!!!
             Pe_isam2 = blkdiag(Pprior_isam2(1:3*nR,1:3*nR),  Pe_isam2(qp_isam2,qp_isam2) );
@@ -288,8 +282,8 @@ for kk = 1:nRuns
             % *approx* covariance recovery for submatrix of Rp_isam2 w/o reordering
             if k+1>2 && ~DO_EXACT_COV_REC
                 PRRk = inv(A_isam2(indxr-3*nR,indxr-3*nR) );
-                %                 Rtem = Rp_isam2(indxr-3*nR,indxr-3*nR);
-                %                 PRRk = (Rtem\eye(size(Rtem))) * (Rtem'\eye(size(Rtem)));
+                %Rtem = Rp_isam2(indxr-3*nR,indxr-3*nR);
+                %PRRk = (Rtem\eye(size(Rtem))) * (Rtem'\eye(size(Rtem)));
             else
                 PRRk = Pe_isam2(indxr,indxr);
             end
@@ -303,8 +297,6 @@ for kk = 1:nRuns
             % *approx* covariance recovery for submatrix of Rp_isam2 w/o reordering
             if k+1>2 && ~DO_EXACT_COV_REC
                 PTTk = inv(A_isam2(indxt-3*nR,indxt-3*nR) );
-                %                 Rtem = Rp_isam2(indxt-3*nR,indxt-3*nR);
-                %                 PTTk = (Rtem\eye(size(Rtem))) * (Rtem'\eye(size(Rtem)));
             else
                 PTTk = Pe_isam2(indxt,indxt);
             end
@@ -342,7 +334,7 @@ for kk = 1:nRuns
         end
         
         DO_EXACT_COV_REC = 0; %exact or approximate covariance recovery
-        % *exact* recovering covariance used in unscented transformation - this is expensive
+        % *exact* recovering covariance used in unscented transformation though this is expensive
         if k+1>2 && DO_EXACT_COV_REC
             Pe_isam3 = (Rp_isam3\eye(size(Rp_isam3)))*(Rp_isam3'\eye(size(Rp_isam3))); %info matrix for the states without first robots' poses which are assumed to be known!!!
             Pe_isam3 = blkdiag(Pprior_isam3(1:3*nR,1:3*nR),  Pe_isam3(qp_isam3,qp_isam3) );
@@ -364,8 +356,6 @@ for kk = 1:nRuns
             % *approx* covariance recovery for submatrix of Rp_isam3 w/o reordering
             if k+1>2 && ~DO_EXACT_COV_REC
                 PRRk = inv(A_isam3(indxr-3*nR,indxr-3*nR) );
-                %                 Rtem = Rp_isam3(indxr-3*nR,indxr-3*nR);
-                %                 PRRk = (Rtem\eye(size(Rtem))) * (Rtem'\eye(size(Rtem)));
             else
                 PRRk = Pe_isam3(indxr,indxr);
             end
@@ -379,8 +369,6 @@ for kk = 1:nRuns
             % *approx* covariance recovery for submatrix of Rp_isam3 w/o reordering
             if k+1>2 && ~DO_EXACT_COV_REC
                 PTTk = inv(A_isam3(indxt-3*nR,indxt-3*nR) );
-                %                 Rtem = Rp_isam3(indxt-3*nR,indxt-3*nR);
-                %                 PTTk = (Rtem\eye(size(Rtem))) * (Rtem'\eye(size(Rtem)));
             else
                 PTTk = Pe_isam3(indxt,indxt);
             end
@@ -429,7 +417,6 @@ for kk = 1:nRuns
         end
     end
    
-    
     xe_bmap = bmap(xinit_bmap, x0,P0, k+1, dt, nR, v_m, omega_m, sigma_v, sigma_w, nT, dim_target,PHIT, QTd, zr, Rr, zt, Rt, zl, Rl, nL);
     
     % save batch results
